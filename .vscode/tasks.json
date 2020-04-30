@@ -45,7 +45,7 @@
         {
             "label": "run",
             "type": "shell",
-            "command": "java -cp \"target/*\" edu.lwtech.csd299.samples.hellomaven.HelloMavenApp"
+            "command": "java -cp \"target/*\" edu.lwtech.csd299.samples.mavenadventure.AdventureGame"
         }
     ]
 }

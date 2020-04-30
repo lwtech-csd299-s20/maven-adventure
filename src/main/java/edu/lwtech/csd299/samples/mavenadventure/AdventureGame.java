@@ -4,269 +4,150 @@ import java.util.*;
 
 public class AdventureGame {
 
-    private enum locale {
-        IN_TOWN,
-        TOWN_GATE,
-        CROSSROADS,
-        FOREST,
-        RIVER,
-        OPEN_ROAD
-    };
-
-	private static Scanner scanner = new Scanner(System.in);
-    
-	private static int goblinHitPoints;
-
-	private static int playerHitPoints;
-	private static String playerName;
-	private static String playerWeapon;
-    private static boolean playerHasSilverRing;
-    private static locale playerLocation;
+    private static Scanner scanner = new Scanner(System.in);
+    private static Map<Locale, Location> locations = new HashMap<>();
+    private static Player player = null;
 
 	public static void main(String[] args) {
-        initializePlayer();
-        while (playerHitPoints > 0 && playerLocation != locale.IN_TOWN) {
+
+        initializeGame();
+
+		System.out.print("Ahoy good sir!  Welcome to Jumanji.  Please enter your name: ");
+		String playerName = scanner.nextLine();
+		System.out.println("Allrighty then, " + playerName + ", let's start the game!");	
+
+        player = new Player(playerName, 10, Locale.TOWN_GATE);
+        player.addToBackpack(new Item("Rabbit's Foot"));
+        player.addToBackpack(new Item("Empty Bottle"));
+        player.equipWeapon(new Weapon("Dagger", 4));
+        player.equipArmor(new Armor("Leather", 4));
+
+        while (player.isAlive() && player.getLocale() != Locale.IN_TOWN) {
             takeTurn();
         }
-        if (playerHitPoints > 0) {
-            System.out.println("Guard: Oh you killed that goblin!?? Great!");
-            System.out.println("Guard: It seems you are a trustworthy guy. Welcome to our town!");
-            System.out.println();
-            System.out.println("           THE END(?)");
-            System.out.println();
+
+        if (player.isAlive()) {
+            System.out.println("Guard: Oh, I see you killed that goblin!  You have saved us all!");
+            System.out.println("Guard: It seems you are a trustworthy guy, " + player.getName() + ". Welcome to our town!");
         } else {
-            die();
+            System.out.println("And thus ends the tale of poor old " + player.getName() + ".  What an idiot...");
         }
-	}
-	
-	private static void initializePlayer() {
-        playerHitPoints = 10;
-        playerWeapon = "Knife";
-        playerHasSilverRing = false;
-        playerLocation = locale.CROSSROADS;
 
-		System.out.print("Please enter your name: ");
-		playerName = scanner.nextLine();
-		System.out.println("Hello " + playerName + ", let's start the game!");	
+        System.out.println();
+        System.out.println("      THE END(?)");
+        System.out.println();
+    }
 
+    private static void takeTurn() {
+        System.out.println("------------------------------------------------------------------");
+        System.out.println(player);
+        System.out.println("------------------------------------------------------------------");
+
+        Location location = locations.get(player.getLocale());
+        System.out.println("You are at " + location.getDescription());
+        location.getPreAction().run();
+        System.out.println("\nWhat would you like to do?");
+        System.out.println(location.getMenu());
+        int i = scanner.nextInt();
+        i--;                                    // Convert 1-based menus into 0-based indexes
+        location.getMenu().runItem(i);
+    }
+
+    private static void initializeGame() {
+
+        // TOWN_GATE
+        LocationMenu menu = new LocationMenu();
+        menu.addItem(new LocationMenuItem("Talk to the guard", ()->talkToGuard()));
+        menu.addItem(new LocationMenuItem("Attack the guard", ()->attackGuard()));
+        menu.addItem(new LocationMenuItem("Go north", ()->player.setLocale(Locale.CROSSROADS)));
+        Location location = new Location(Locale.TOWN_GATE,
+            "the gates of a town. A guard is standing in front of you.",
+            menu);
+        locations.put(Locale.TOWN_GATE, location);
+
+        // CROSSROADS
+        menu = new LocationMenu();
+        menu.addItem(new LocationMenuItem("Go north", ()->player.setLocale(Locale.RIVER)));
+        menu.addItem(new LocationMenuItem("Go east", ()->player.setLocale(Locale.WOODS)));
+        menu.addItem(new LocationMenuItem("Go south", ()->player.setLocale(Locale.TOWN_GATE)));
+        menu.addItem(new LocationMenuItem("Go west", ()->player.setLocale(Locale.GOBLIN)));
+        location = new Location(Locale.CROSSROADS,
+            "a lonely 4-way crossroads. You cannot see what lies in each direction.",
+            menu);
+        locations.put(Locale.CROSSROADS, location);
+
+        // RIVER
+        menu = new LocationMenu();
+        menu.addItem(new LocationMenuItem("Go south", ()->player.setLocale(Locale.CROSSROADS)));
+        menu.addItem(new LocationMenuItem("Rest some more", ()->player.setLocale(Locale.RIVER)));
+        location = new Location(Locale.RIVER,
+            "a swift-flowing, broad river.\nYou drink the water and rest at the riverside. You feel refreshed.",
+            menu);
+        location.setPreAction(()->player.setHitPoints(player.getHitPoints() + 1));
+        locations.put(Locale.RIVER, location);
+
+        // WOODS
+        menu = new LocationMenu();
+        menu.addItem(new LocationMenuItem("Go west", ()->player.setLocale(Locale.CROSSROADS)));
+        location = new Location(Locale.WOODS,
+            "a dark forboding forest.\nYou discover a Long Sword hidden behind a tree. You pick up the sword.",
+            menu);
+        location.setPreAction(()->player.equipWeapon(new Weapon("Long Sword", 8)));
+        locations.put(Locale.WOODS, location);
+
+        // GOBLIN
+        menu = new LocationMenu();
+        Monster monster = new Monster("Fred the Goblin", "Goblin", 15, 6, 1, Locale.GOBLIN);
+        menu.addItem(new LocationMenuItem("Attack!", ()->fight(monster)));
+        menu.addItem(new LocationMenuItem("Run away!", ()->player.setLocale(Locale.CROSSROADS)));
+        location = new Location(Locale.GOBLIN,
+            "a tree that has fallen (or been placed) across the road.\nSuddenly, a Goblin advances towards you menacingly...",
+            menu);
+        locations.put(Locale.GOBLIN, location);
+    }
+
+    private static void talkToGuard() {
+        if (player.searchBackpack("Silver Ring")) {
+            player.setLocale(Locale.IN_TOWN);
+        } else {
+            System.out.println("Guard: Hello there, stranger. So your name is " + player.getName() + " is it?");
+            System.out.println("Sorry but I cannot let a stranger like yourself enter our town without proof that you are trustworthy.");
+            scanner.nextLine();
+        }
+    }
+
+    private static void attackGuard() {
+        System.out.println("Guard: Right. Here's something for your trouble.");
+        player.setHitPoints(player.getHitPoints() - 2);
     }
     
-    private static void takeTurn() {
+	private static void fight(Monster monster) {
+        while (true) {
+            player.attack(monster);
+            System.out.println("You attack " + monster.getName() + "!  They now have " + monster.getHitPoints() + " health.");
+            if (monster.getHitPoints() <= 0) {
+                System.out.println("Congratulations! You are victorious (this time)!");
+                System.out.println("You find a small Silver Ring on the corpse and put it in your backpack and head back to the crossroads before more goblins appear.");
+                player.addToBackpack(new Item("Silver Ring"));
+                player.setLocale(Locale.CROSSROADS);
+                return;
+            }
 
-		System.out.println("------------------------------------------------------------------");
-        System.out.print("Your Status>> Health: "+ playerHitPoints);
-        System.out.print("  Weapon: "+ playerWeapon);
-        System.out.print("  Inventory: [");
-        if (playerHasSilverRing) System.out.print("Silver Ring");
-        System.out.println("]");
-		System.out.println("------------------------------------------------------------------");
+            monster.attack(player);
+            System.out.println(monster.getName() + " attacks you!  You now have " + player.getHitPoints() + " health.");
+            if (player.getHitPoints() <= 0) {
+                System.out.println("Oooooooooo...  That's gotta hurt!");
+                return;
+            }
 
-        switch (playerLocation) {
-            case TOWN_GATE:
-                approachTown();
-                break;
-
-            case CROSSROADS:
-                approachCrossroads();
-                break;
-                
-            case FOREST:
-                approachForest();
-                break;
-            
-            case RIVER:
-                approachRiver();
-                break;
-            
-            case OPEN_ROAD:
-                approachGoblin();
-                break;
-
-            default:
-                break;
-        }
-    }
-	
-	private static void approachTown() {
-		System.out.println("You are at the gate of the town.");
-		System.out.println("A guard is standing in front of you.");
-		System.out.println("1: Talk to the guard");
-		System.out.println("2: Attack the guard");
-		System.out.println("3: Leave");
-		int choice = scanner.nextInt();
-		
-		switch (choice) {
-            case 1:
-                if (playerHasSilverRing) {
-                    playerLocation = locale.IN_TOWN;
-                } else {
-                    System.out.println("Guard: Hello there, stranger. So your name is " + playerName + "? Sorry but we cannot let stranger enter our town.");
-                    scanner.nextLine();
-                    playerLocation = locale.TOWN_GATE;
-                }
-                break;
-			
-		    case 2: 
-                playerHitPoints--;
-                System.out.println("Guard: Hey don't be stupid.The guard hit you so hard and you gave up. (You receive 1 damage)");
-                playerLocation = locale.TOWN_GATE;
-                break;
-
-		    case 3:
-                playerLocation = locale.CROSSROADS;
-                break;
-
-		    default:
-                playerLocation = locale.TOWN_GATE;
-                break;
-		}
-	}
-	
-	private static void approachCrossroads() {
-		System.out.println("You are at a crossroad. If you go south, you will go back to the town.");
-		System.out.println("1: Go north");
-		System.out.println("2: Go east");
-		System.out.println("3: Go south");
-		System.out.println("4: Go west");
-		int choice = scanner.nextInt();
-        
-        switch (choice) {
-            case 1:
-                playerLocation = locale.RIVER;
-                break;
-            case 2:
-                playerLocation = locale.FOREST;
-                break;
-            case 3:
-                playerLocation = locale.TOWN_GATE;
-                break;
-            case 4:
-                playerLocation = locale.OPEN_ROAD;
-                break;
-            default:
-                playerLocation = locale.CROSSROADS;
-                break;
-        }
-	}
-	
-	private static void approachRiver() {
-        playerHitPoints++;
-        
-		System.out.println("You are at a river. You drink the water and rest at the riverside.");
-		System.out.println("Your HP is recovered.");
-		System.out.println("Your HP: " + playerHitPoints);
-        System.out.println("1: Go back to the crossroads");
-        System.out.println("2: Stay at the river");
-		int choice = scanner.nextInt();
-        
-        switch (choice) {
-            case 1:
-                playerLocation = locale.CROSSROADS;
-                break;
-            case 2:
-                playerLocation = locale.RIVER;
-                break;
-            default:
-                playerLocation = locale.RIVER;
-                break;
-		}
-	}
-	
-	private static void approachForest() {
-		playerWeapon = "Long Sword";
-
-		System.out.println("You walked into a forest and found a Long Sword!");
-		System.out.println("Your Weapon: "+ playerWeapon);
-		System.out.println("1: Go back to the crossroad");
-		int choice = scanner.nextInt();
-		
-		switch (choice) {
-            case 1:
-                playerLocation = locale.CROSSROADS;
-                break;
-            default:
-                playerLocation = locale.FOREST;
-                break;
-		}
-	}
-	
-	private static void approachGoblin() {
-        goblinHitPoints = 15;
-
-		System.out.println("You encounter a goblin!");
-		System.out.println("1: Fight");
-		System.out.println("2: Run");
-		int choice = scanner.nextInt();
-		
-        switch (choice) {
-            case 1:
-                fight();
-                break;
-		    case 2:
-                playerLocation = locale.CROSSROADS;
-                break;
-            default:
-                playerLocation = locale.OPEN_ROAD;
-                break;
-		}
-	}
-	
-	private static void fight() {
-        while (playerLocation == locale.OPEN_ROAD && playerHitPoints > 0) {
-            System.out.print("Your HP: "+ playerHitPoints);
-            System.out.println(" Goblin HP: " + goblinHitPoints);
-            System.out.println("1: Attack");
-            System.out.println("2: Run");
-            int choice = scanner.nextInt();
-            
-            switch (choice) {
-                case 1:
-                    attack();
-                    if (goblinHitPoints < 1) {
-                        playerHasSilverRing = true;
-                        System.out.println("You killed the monster!");
-                        System.out.println("The monster dropped a ring!");
-                        System.out.println("You obtaind a silver ring!");
-                        playerLocation = locale.CROSSROADS;
-                    }
-                    break;
-                case 2:
-                    playerLocation = locale.CROSSROADS;
-                    break;
+            System.out.print("Do you wish to continue this ill-advised assault (y/n)?");
+            String s = scanner.next();
+            if (s.toLowerCase().startsWith("n")) {
+                System.out.println("Descretion truly is the better part of valor, eh what?");
+                player.setLocale(Locale.CROSSROADS);
+                return;
             }
         }
 	}
-	
-	private static void attack() {
-        int maxDamage;
-        switch (playerWeapon) {
-            case "Knife":
-                maxDamage = 5;
-                break;
-            case "Long Sword":
-                maxDamage = 8;
-                break;
-            default:
-                maxDamage = 0;
-                break;
-        }
-		int playerDamage = new Random().nextInt(maxDamage); 
-
-        System.out.println("You attacked the goblin and gave " + playerDamage + " damage!");
-		goblinHitPoints -= playerDamage;
-		System.out.println("Goblin HP: " + goblinHitPoints);
-		
-        if (goblinHitPoints > 0) {
-			int monsterDamage = new java.util.Random().nextInt(4);
-			System.out.println("The monster attacked you and gave " + monsterDamage + " damage!");
-			playerHitPoints = playerHitPoints - monsterDamage;
-			System.out.println("Player HP: " + playerHitPoints);
-		}
-	}
-	
-	private static void die() {
-		System.out.println("You are dead!!!");
-		System.out.println("GAME OVER!");
-	}
-		
+			
 }

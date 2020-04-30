@@ -6,7 +6,14 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug (Launch) - Current File",
+            "name": "CodeLens (Launch)-AdventureGame",
+            "request": "launch",
+            "mainClass": "edu.lwtech.csd299.samples.mavenadventure.AdventureGame",
+            "projectName": "maven-adventure"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Current File",
             "request": "launch",
             "mainClass": "${file}"
         },
@@ -15,7 +22,7 @@
             "name": "Debug (Launch)-MavenAdventure",
             "request": "launch",
             "mainClass": "edu.lwtech.csd299.samples.mavenadventure.AdventureGame",
-            "projectName": "hello-maven"
+            "projectName": "maven-adventure"
         }
     ]
 }
