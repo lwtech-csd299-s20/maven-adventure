@@ -99,6 +99,7 @@ public class AdventureGame {
 
         // GOBLIN
         menu = new LocationMenu();
+        Monster monster = new Monster("Goblin", 15, 6, 1);
         monster.addLoot(new Item("Silver Ring"));
         menu.addItem(new LocationMenuItem("Attack!", ()->fight(monster)));
         menu.addItem(new LocationMenuItem("Run away!", ()->player.setLocale(Locale.CROSSROADS)));
@@ -141,7 +142,9 @@ public class AdventureGame {
             }
 
             monster.attack(player);
-            System.out.println(monster.getName() + " attacks you!  You now have " + player.getHitPoints() + " health.");
+            String name = monster.getName();
+            String capitalName = name.substring(0,1).toUpperCase() + name.substring(1);
+            System.out.println(capitalName + " attacks you!  You now have " + player.getHitPoints() + " health.");
             if (player.getHitPoints() <= 0) {
                 System.out.println("Oooooooooo...  That's gotta hurt!");
                 return;

@@ -8,6 +8,14 @@ public class Monster extends Actor implements Fighter {
     private int maxProtection;
     private List<Item> loot;
 
+    public Monster(String species, int hitPoints, int maxDamage, int maxProtection) {
+        this("the " + species, species, hitPoints, maxDamage, maxProtection);
+    }
+
+    public Monster(String name, String species, int hitPoints, int maxDamage, int maxProtection) {
+        this(name, species, hitPoints, maxDamage, maxProtection, Locale.ANYWHERE);
+    }
+
     public Monster(String name, String species, int hitPoints, int maxDamage, int maxProtection, Locale locale) {
         super(name, "Monster", species, hitPoints, locale);
         this.maxDamage = maxDamage;
