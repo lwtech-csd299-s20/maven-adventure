@@ -99,7 +99,7 @@ public class AdventureGame {
 
         // GOBLIN
         menu = new LocationMenu();
-        Monster monster = new Monster("Fred the Goblin", "Goblin", 15, 6, 1, Locale.GOBLIN);
+        monster.addLoot(new Item("Silver Ring"));
         menu.addItem(new LocationMenuItem("Attack!", ()->fight(monster)));
         menu.addItem(new LocationMenuItem("Run away!", ()->player.setLocale(Locale.CROSSROADS)));
         location = new Location(Locale.GOBLIN,
@@ -130,8 +130,12 @@ public class AdventureGame {
             System.out.println("You attack " + monster.getName() + "!  They now have " + monster.getHitPoints() + " health.");
             if (monster.getHitPoints() <= 0) {
                 System.out.println("Congratulations! You are victorious (this time)!");
-                System.out.println("You find a small Silver Ring on the corpse and put it in your backpack and head back to the crossroads before more goblins appear.");
-                player.addToBackpack(new Item("Silver Ring"));
+                List<Item> loot = monster.takeLoot();
+                for (Item item : loot) {
+                    System.out.println("You find a " + item.getName() + " on the corpse and put it in your backpack.");
+                    player.addToBackpack(item);
+                }
+                System.out.println("You head back to the crossroads before more monsters can arrive.");
                 player.setLocale(Locale.CROSSROADS);
                 return;
             }
