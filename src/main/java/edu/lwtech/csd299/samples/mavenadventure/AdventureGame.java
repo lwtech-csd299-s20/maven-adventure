@@ -27,10 +27,10 @@ public class AdventureGame {
         }
 
         if (player.isAlive()) {
-            System.out.println("Guard: Oh, I see you killed that goblin!  You have saved us all!");
+            System.out.println("Guard: Oh, I see you killed that pesky goblin! You have saved us all!");
             System.out.println("Guard: It seems you are a trustworthy guy, " + player.getName() + ". Welcome to our town!");
         } else {
-            System.out.println("And thus ends the tale of poor old " + player.getName() + ".  What an idiot...");
+            System.out.println("And thus ends the tale of poor old " + player.getName() + ".  What an idiot!");
         }
 
         System.out.println();
@@ -39,6 +39,7 @@ public class AdventureGame {
     }
 
     private static void takeTurn() {
+        System.out.println();
         System.out.println("------------------------------------------------------------------");
         System.out.println(player);
         System.out.println("------------------------------------------------------------------");
@@ -47,8 +48,9 @@ public class AdventureGame {
         System.out.println("You are at " + location.getDescription());
         location.getPreAction().run();
         System.out.println("\nWhat would you like to do?");
-        System.out.println(location.getMenu());
+        System.out.print(location.getMenu());
         int i = scanner.nextInt();
+        System.out.println();
         i--;                                    // Convert 1-based menus into 0-based indexes
         location.getMenu().runItem(i);
     }
@@ -57,9 +59,9 @@ public class AdventureGame {
 
         // TOWN_GATE
         LocationMenu menu = new LocationMenu();
+        menu.addItem(new LocationMenuItem("Go north", ()->player.setLocale(Locale.CROSSROADS)));
         menu.addItem(new LocationMenuItem("Talk to the guard", ()->talkToGuard()));
         menu.addItem(new LocationMenuItem("Attack the guard", ()->attackGuard()));
-        menu.addItem(new LocationMenuItem("Go north", ()->player.setLocale(Locale.CROSSROADS)));
         Location location = new Location(Locale.TOWN_GATE,
             "the gates of a town. A guard is standing in front of you.",
             menu);
@@ -118,6 +120,7 @@ public class AdventureGame {
 
     private static void attackGuard() {
         System.out.println("Guard: Right. Here's something for your trouble.");
+        System.out.println("You loose 2 health.");
         player.setHitPoints(player.getHitPoints() - 2);
     }
     
