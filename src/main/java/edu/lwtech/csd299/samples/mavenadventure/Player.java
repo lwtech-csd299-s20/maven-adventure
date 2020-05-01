@@ -29,6 +29,16 @@ public class Player extends Actor implements Fighter {
         backpack.add(item);
     }
 
+    public Item removeFromBackpack(String itemName) {
+        for (Item item : backpack) {
+            if (item.name == itemName) {
+                backpack.remove(item);
+                return item;
+            }
+        }
+        return null;
+    }
+
     public boolean searchBackpack(String itemName) {
         for (Item item : backpack) {
             if (item.name == itemName)
