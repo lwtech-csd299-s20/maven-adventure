@@ -12,9 +12,11 @@ public class AdventureGame {
 
         initializeGame();
 
-		System.out.print("Ahoy good sir!  Welcome to Jumanji.  Please enter your name: ");
+        System.out.println();
+        System.out.println("Ahoy good sir!  Welcome to Jumanji!");
+        System.out.print("Please enter your name: ");
 		String playerName = scanner.nextLine();
-		System.out.println("Allrighty then, " + playerName + ", let's start the game!");	
+		System.out.println("Alrighty then, " + playerName + ", let's start the game!  Your goal is to get into the town.");	
 
         player = new Player(playerName, 10, Locale.TOWN_GATE);
         player.addToBackpack(new Item("Rabbit's Foot"));
