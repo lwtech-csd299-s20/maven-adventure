@@ -28,6 +28,18 @@
             "group": "build"
         },
         {
+            "label": "test",
+            "type": "shell",
+            "command": "mvn -B surefire:test",
+            "group": "test"
+        },
+        {
+            "label": "test-coverage",
+            "type": "shell",
+            "command": "mvn -B surefire:test jacoco:prepare-agent install jacoco:report",
+            "group": "test"
+        },
+        {
             "label": "build",
             "type": "shell",
             "command": "mvn -B package",
@@ -36,7 +48,7 @@
         {
             "label": "clean+build",
             "type": "shell",
-            "command": "mvn -B clean package",
+            "command": "mvn -B clean:clean compiler:compile compiler:testCompile surefire:test jacoco:prepare-agent install jacoco:report",
             "group": {
                 "kind": "build",
                 "isDefault": true
