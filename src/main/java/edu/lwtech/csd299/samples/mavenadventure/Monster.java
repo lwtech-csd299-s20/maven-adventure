@@ -9,7 +9,7 @@ public class Monster extends Actor implements Fighter {
     private List<Item> loot;
 
     public Monster(String species, int hitPoints, int maxDamage, int maxProtection) {
-        this("the " + species, species, hitPoints, maxDamage, maxProtection);
+        this((species == null ? species : "the " + species), species, hitPoints, maxDamage, maxProtection);
     }
 
     public Monster(String name, String species, int hitPoints, int maxDamage, int maxProtection) {
@@ -17,7 +17,9 @@ public class Monster extends Actor implements Fighter {
     }
 
     public Monster(String name, String species, int hitPoints, int maxDamage, int maxProtection, Locale locale) {
+
         super(name, "Monster", species, hitPoints, locale);
+
         this.maxDamage = maxDamage;
         this.maxProtection = maxProtection;
         this.loot = new ArrayList<>();
