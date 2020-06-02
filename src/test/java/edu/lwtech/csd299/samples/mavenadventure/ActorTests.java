@@ -22,11 +22,13 @@ public class ActorTests {
     @Test(expected = IllegalArgumentException.class)
     public void constructorNameNullTest() {
         testMonster = new Monster(null, "Orc", 0, 0, 0, Locale.WOODS);
+        fail("Exception not thrown.");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void constructorNameEmptyTest() {
         testMonster = new Monster("", "Orc", 0, 0, 0, Locale.WOODS);
+        fail("Exception not thrown.");
     }
 
     @Test(expected = IllegalArgumentException.class)
