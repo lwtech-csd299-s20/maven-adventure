@@ -80,12 +80,20 @@ public class MonsterTests {
         int initialHitPoints = testMonster.getHitPoints();
 
         testMonster.defend(20);
-        testMonster.defend(20);
-        testMonster.defend(20);
-        testMonster.defend(20);
-        testMonster.defend(20);
-
         assertTrue(testMonster.getHitPoints() < initialHitPoints);
+
+        // Ensure that weak attacks doesn't result in negative damage
+        initialHitPoints = testMonster.getHitPoints();
+        testMonster.defend(1);
+        testMonster.defend(1);
+        testMonster.defend(1);
+        testMonster.defend(1);
+        assertTrue(testMonster.getHitPoints() < initialHitPoints);
+
+        // Negative attacks should be ignored
+        initialHitPoints = testMonster.getHitPoints();
+        testMonster.defend(-100);
+        assertEquals(initialHitPoints, testMonster.getHitPoints());
     }
 
 }
