@@ -11,6 +11,15 @@ public abstract class Actor {
     // ------------------------------------------
 
     public Actor(String name, String type, String species, int hitPoints, Locale locale) {
+
+        if (name == null) throw new IllegalArgumentException("name cannot be null");
+        if (name.length() == 0) throw new IllegalArgumentException("name cannot be empty");
+        if (type == null) throw new IllegalArgumentException("type cannot be null");
+        if (type.length() == 0) throw new IllegalArgumentException("type cannot be empty");
+        if (species == null) throw new IllegalArgumentException("species cannot be null");
+        if (species.length() == 0) throw new IllegalArgumentException("species cannot be empty");
+        if (hitPoints < 0) throw new IllegalArgumentException("hitPoints cannot be negative");
+
         this.name = name;
         this.type = type;
         this.species = species;
