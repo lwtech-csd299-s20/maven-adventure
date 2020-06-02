@@ -20,6 +20,12 @@ public class MonsterTests {
         assertNotNull(testMonster);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorNullNameTest() {
+        testMonster = new Monster(null, 100, 50, 50);
+        fail("Exception not thrown.");
+    }
+
     @Test
     public void constructorNoLocaleTest() {
         testMonster = new Monster("Fred", "Orc", 100, 50, 50);
