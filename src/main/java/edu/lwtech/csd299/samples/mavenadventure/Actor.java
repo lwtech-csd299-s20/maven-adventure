@@ -61,6 +61,8 @@ public abstract class Actor {
 
     public void takeDamage(int damage) {
         hitPoints -= damage;
+        if (hitPoints < 0)
+            hitPoints = 0;
     }
 
     public void setLocale(Locale locale) {
