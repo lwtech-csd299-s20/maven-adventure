@@ -31,7 +31,7 @@ public class Monster extends Actor implements Fighter {
 
     public List<Item> takeLoot() {
         List<Item> taken = loot;
-        loot = new ArrayList<Item>();       // Remove the loot from the monster
+        loot = new ArrayList<>();       // Remove the loot from the monster
         return taken;
     }
 
@@ -46,7 +46,7 @@ public class Monster extends Actor implements Fighter {
     @Override
     public void defend(int damage) {
         damage -= (int)(Math.random() * maxProtection);
-        if (damage < 0) damage = 0;
+        if (damage < 0) damage = 0;     // Damage cannot go negative
         takeDamage(damage);
     }
 
