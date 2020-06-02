@@ -58,7 +58,8 @@ public class Player extends Actor implements Fighter {
     @Override
     public void defend(int damage) {
         damage -= (int)(Math.random() * armor.getProtection());
-        if (damage < 0) damage = 0;
+        if (damage < 0)
+            damage = 0;
         takeDamage(damage);
     }
 

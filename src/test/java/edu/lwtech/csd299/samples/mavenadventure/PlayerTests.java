@@ -46,10 +46,10 @@ public class PlayerTests {
     @Test
     public void removeFromBackpackTest() {
         assertFalse(testPlayer.toString().contains("Ring"));
-        Item ring = new Item("Ring");
-        testPlayer.addToBackpack(ring);
+        testPlayer.addToBackpack(new Item("Lunch"));
+        testPlayer.addToBackpack(new Item("Ring"));
         assertTrue(testPlayer.toString().contains("Ring"));
-        ring = testPlayer.removeFromBackpack("Ring");
+        Item ring = testPlayer.removeFromBackpack("Ring");
         assertNotNull(ring);
         assertFalse(testPlayer.toString().contains("Ring"));
         // Try to remove a missing item
@@ -60,16 +60,17 @@ public class PlayerTests {
     @Test
     public void searchBackpackTest() {
         assertFalse(testPlayer.searchBackpack("Ring"));
+        testPlayer.addToBackpack(new Item("Lunch"));
         testPlayer.addToBackpack(new Item("Ring"));
         assertTrue(testPlayer.searchBackpack("Ring"));
     }
 
     @Test
     public void attackTest() {
-        testPlayer.equipWeapon(new Weapon("Sword", 10));
-        Monster foe = new Monster("Foe", "Orc", 100, 0, 0, Locale.ANYWHERE);        // Foe is defenseless
+        Monster foe = new Monster("Foe", "Orc", 100, 0, 0, Locale.ANYWHERE);    // Foe is defenseless
         int initialHitPoints = foe.getHitPoints();
 
+        testPlayer.equipWeapon(new Weapon("Sword", 40));
         testPlayer.attack(foe);
         testPlayer.attack(foe);
         testPlayer.attack(foe);
@@ -81,15 +82,23 @@ public class PlayerTests {
 
     @Test
     public void defendTest() {
+        testPlayer = new Player("Fred", 100, Locale.ANYWHERE);      // Fred is defenseless
         int initialHitPoints = testPlayer.getHitPoints();
 
         testPlayer.defend(20);
-        testPlayer.defend(20);
-        testPlayer.defend(20);
-        testPlayer.defend(20);
-        testPlayer.defend(20);
-
         assertTrue(testPlayer.getHitPoints() < initialHitPoints);
-    }
 
+        // Ensure that weak attacks doesn't result in negative damage
+        initialHitPoints = testPlayer.getHitPoints();
+        testPlayer.defend(1);
+        testPlayer.defend(1);
+        testPlayer.defend(1);
+        testPlayer.defend(1);
+        assertTrue(testPlayer.getHitPoints() < initialHitPoints);
+
+        // Negative attacks should be ignored
+        initialHitPoints = testPlayer.getHitPoints();
+        testPlayer.defend(-100);
+        assertEquals(initialHitPoints, testPlayer.getHitPoints());
+    }
 }
