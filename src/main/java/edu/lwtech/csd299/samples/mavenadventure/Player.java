@@ -31,7 +31,7 @@ public class Player extends Actor implements Fighter {
 
     public Item removeFromBackpack(String itemName) {
         for (Item item : backpack) {
-            if (item.name == itemName) {
+            if (item.name.equals(itemName)) {
                 backpack.remove(item);
                 return item;
             }
@@ -41,7 +41,7 @@ public class Player extends Actor implements Fighter {
 
     public boolean searchBackpack(String itemName) {
         for (Item item : backpack) {
-            if (item.name == itemName)
+            if (item.name.equals(itemName))
                 return true;
         }
         return false;
