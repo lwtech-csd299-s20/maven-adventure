@@ -1,0 +1,1 @@
+java -cp target/maven-adventure-1.0.jar:target edu.lwtech.csd299.samples.mavenadventure.AdventureGame
